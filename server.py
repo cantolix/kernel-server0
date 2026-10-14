@@ -66,6 +66,18 @@ def login():
   return jsonify({"message": "OK"}), 200
 
 
+@app.route("/api/users", methods=["GET"])
+def get_users():
+  rows = db_exec(
+      "SELECT username, status, suspension_until FROM users", fetch="all"
+  )
+  return jsonify([{
+      "username": r[0],
+      "status": r[1],
+      "suspension_until": r[2],
+  } for r in rows]), 200
+
+
 @app.route("/api/change-password", methods=["POST"])
 def change_pwd():
   d = request.json
