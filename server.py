@@ -84,23 +84,25 @@ def log_session():
   )
   conn.commit()
   conn.close()
-  return jsonify({"message": "Log recorded"}), 200
+  return jsonify({"message": "Log recorded under account"}), 200
 
 
-@app.route("/api/logs", methods=["GET"])
-def view_logs():
+@app.route("/api/history/<username>", methods=["GET"])
+def user_history(username):
   conn = sqlite3.connect(DB_NAME)
   cursor = conn.cursor()
-  cursor.execute("SELECT * FROM session_logs ORDER BY id DESC")
+  cursor.execute(
+      "SELECT target, case_file, ip_address, timestamp FROM session_logs WHERE"
+      " username = ? ORDER BY id DESC",
+      (username,),
+  )
   rows = cursor.fetchall()
   conn.close()
   return jsonify([{
-      "id": r[0],
-      "admin": r[1],
-      "target": r[2],
-      "case_file": r[3],
-      "ip": r[4],
-      "time": r[5],
+      "target": r[0],
+      "case_file": r[1],
+      "ip": r[2],
+      "time": r[3],
   } for r in rows]), 200
 
 
